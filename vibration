@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pressure</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+
+<body>
+    <div id="chart"></div>
+
+</body>
+
+
+<script>
+    let from = moment().subtract(120, 'minutes').valueOf()
+    let to = moment().valueOf()
+    console.log(from)
+    caller()
+
+
+    async function caller() {
+        const data = await this.getJSON();
+        console.log(data)
+
+        const graph = data.reduce((pv, cv) => {
+            pv.push([cv.time, cv.values[1]])
+            return pv
+        }, [])
+        console.log(graph)
+
+        generateGraph("Pressure", graph)
+
+    }
+
+    async function getJSON() {
+        return fetch('https://us-central1-neuron2.cloudfunctions.net/sensorStream', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // body: '{ \n\t"apiKey": "44uDouTrx79Y82eI8G4QGlUirPTa+H+EmsP8J/Pq2G8=",\n\t"sn": "30002407",\n\t"from": 1658824758883,\n\t"to": 1658828358883,\n        "limit": 100 \n}',
+            body: JSON.stringify({
+                'apiKey': '44uDouTrx79Y82eI8G4QGlUirPTa+H+EmsP8J/Pq2G8=',
+                'sn': '21000701',
+                'from': from,
+                'to': to,
+                'limit': 1000
+            })
+        })
+            .then((response) => response.json())
+            .then((responseJson) => { return responseJson });
+    }
+
+    function generateGraph(name, data) {
+        var options = {
+            chart: {
+                toolbar: {
+                    show: false
+                },
+                height: 380,
+                width: "100%",
+                type: "area",
+                animations: {
+                    initialAnimation: {
+                        enabled: false
+                    }
+                }
+            },
+            series: [
+                {
+                    name: "Vibration",
+                    data: data
+                }
+            ],
+            xaxis: {
+                type: 'datetime'
+            },
+            tooltip: {
+                x: {
+                    format: 'HH:mm:ss'
+                },
+                y: {
+                    formatter: (Vibration) => Vibration + " g",
+                },
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+        chart.render();
+
+    }
+</script>
+
+</html>
