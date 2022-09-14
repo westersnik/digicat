@@ -17,8 +17,8 @@
 
 
 <script>
-    let from = moment().subtract(120, 'minutes').valueOf()
-    let to = moment().valueOf()
+    let from = moment().subtract(120, 'minutes').value1f()
+    let to = moment().value1f()
     console.log(from)
     caller()
 
@@ -85,7 +85,7 @@
                     format: 'HH:mm:ss'
                 },
                 y: {
-                    formatter: (Vibration) => Vibration + " g",
+                    formatter: (Vibration) => Vibration + "g",
                 },
             }
         };
